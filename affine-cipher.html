@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Affine Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+      <div class="container">
+        <a class="navbar-brand text-light" href="index.html">Alfi Syahrin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="caesar.html">Caesar</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="affine-cipher.html">Affine Cipher</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="simetrik.html">Simetrik</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="asimetrik.html">Asasimetrik</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <h1 class="mb-4">Affine Cipher</h1>
+
+      <div class="form-group">
+        <label for="plaintext">Masukkan Teks:</label>
+        <input type="text" class="form-control" id="plaintext" />
+      </div>
+
+      <div class="form-group">
+        <label for="keyA">Kunci a (bilangan bulat relatif prima dengan 26):</label>
+        <input type="number" class="form-control" id="keyA" min="1" max="25" value="3" />
+      </div>
+
+      <div class="form-group">
+        <label for="keyB">Kunci b (bilangan bulat):</label>
+        <input type="number" class="form-control" id="keyB" min="0" max="25" value="7" />
+      </div>
+
+      <button class="btn btn-primary mr-2" onclick="encrypt()">Enkripsi</button>
+      <button class="btn btn-primary" onclick="decrypt()">Dekripsi</button>
+
+      <div class="form-group mt-4">
+        <label for="result">Hasil:</label>
+        <input type="text" class="form-control" id="result" readonly />
+      </div>
+    </div>
+
+    <script>
+      function modInverse(a, m) {
+        a = ((a % m) + m) % m;
+        for (let x = 1; x < m; x++) {
+          if ((a * x) % m == 1) return x;
+        }
+        return 1;
+      }
+
+      function affineCipherEncrypt(text, keyA, keyB) {
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+          let char = text.charCodeAt(i);
+          if (char >= 65 && char <= 90) {
+            result += String.fromCharCode(((keyA * (char - 65) + keyB) % 26) + 65);
+          } else if (char >= 97 && char <= 122) {
+            result += String.fromCharCode(((keyA * (char - 97) + keyB) % 26) + 97);
+          } else {
+            result += text.charAt(i);
+          }
+        }
+        return result;
+      }
+
+      function affineCipherDecrypt(text, keyA, keyB) {
+        let result = '';
+        let modInverseKeyA = modInverse(keyA, 26);
+        for (let i = 0; i < text.length; i++) {
+          let char = text.charCodeAt(i);
+          if (char >= 65 && char <= 90) {
+            result += String.fromCharCode(((modInverseKeyA * (char - 65 - keyB + 26)) % 26) + 65);
+          } else if (char >= 97 && char <= 122) {
+            result += String.fromCharCode(((modInverseKeyA * (char - 97 - keyB + 26)) % 26) + 97);
+          } else {
+            result += text.charAt(i);
+          }
+        }
+        return result;
+      }
+
+      function encrypt() {
+        const plaintext = document.getElementById('plaintext').value;
+        const keyA = parseInt(document.getElementById('keyA').value);
+        const keyB = parseInt(document.getElementById('keyB').value);
+        const encryptedText = affineCipherEncrypt(plaintext, keyA, keyB);
+        document.getElementById('result').value = encryptedText;
+      }
+
+      function decrypt() {
+        const ciphertext = document.getElementById('result').value;
+        const keyA = parseInt(document.getElementById('keyA').value);
+        const keyB = parseInt(document.getElementById('keyB').value);
+        const decryptedText = affineCipherDecrypt(ciphertext, keyA, keyB);
+        document.getElementById('plaintext').value = decryptedText;
+      }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

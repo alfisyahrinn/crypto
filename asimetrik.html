@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enkripsi dan Dekripsi RSA</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+    <div class="container">
+      <a class="navbar-brand text-light" href="index.html">Alfi Syahrin</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item text-light">
+            <a class="nav-link text-light" href="caesar.html">Caesar</a>
+          </li>
+          <li class="nav-item text-light">
+            <a class="nav-link text-light" href="affine-cipher.html">Affine Cipher</a>
+          </li>
+          <li class="nav-item text-light">
+            <a class="nav-link text-light" href="simetrik.html">Simetrik</a>
+          </li>
+          <li class="nav-item text-light">
+            <a class="nav-link text-light" href="asimetrik.html">Asasimetrik</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container mt-5">
+    <h1>Enkripsi dan Dekripsi RSA</h1>
+
+    <div class="form-group">
+      <label for="inputText">Masukkan Teks:</label>
+      <input type="text" class="form-control" id="inputText" />
+    </div>
+
+    <button class="btn btn-primary mr-2" onclick="encrypt()">Enkripsi</button>
+    <button class="btn btn-primary" onclick="decrypt()">Dekripsi</button><br><br>
+
+    <div class="form-group">
+      <label for="result">Hasil:</label>
+      <input type="text" class="form-control" id="result" readonly>
+    </div>
+  </div>
+
+  <script>
+    // Fungsi enkripsi dengan kunci publik (untuk tujuan demonstrasi)
+    function encrypt() {
+      const plaintext = document.getElementById('inputText').value;
+
+      // Menentukan kunci publik dan pribadi (biasanya didapatkan dari proses yang lebih kompleks)
+      const publicKey = {
+        e: BigInt('65537'), // Eksponen publik
+        n: BigInt('9516311845790656153499716760847001433441357'), // Modulus
+      };
+
+      const encrypted = rsaEncrypt(plaintext, publicKey.e, publicKey.n);
+      document.getElementById('result').value = encrypted;
+    }
+
+    // Fungsi dekripsi dengan kunci pribadi (untuk tujuan demonstrasi)
+    function decrypt() {
+      const ciphertext = document.getElementById('result').value;
+
+      // Kunci pribadi (dalam implementasi RSA yang sebenarnya, kunci pribadi tidak boleh disebarkan atau disimpan secara terbuka)
+      const privateKey = {
+        d: BigInt('5617843187844953170308463622230283376298685'), // Eksponen pribadi
+        n: BigInt('9516311845790656153499716760847001433441357'), // Modulus (sama dengan kunci publik dalam contoh ini)
+      };
+
+      const decrypted = rsaDecrypt(ciphertext, privateKey.d, privateKey.n);
+      document.getElementById('inputText').value = decrypted;
+    }
+
+    // Fungsi enkripsi RSA
+    function rsaEncrypt(plaintext, e, n) {
+      const textBigInt = BigInt('0x' + str2hex(plaintext)); // Konversi teks ke BigInt
+      const encryptedBigInt = modPow(textBigInt, e, n);
+      return encryptedBigInt.toString(16);
+    }
+
+    // Fungsi dekripsi RSA
+    function rsaDecrypt(ciphertext, d, n) {
+      const decryptedBigInt = modPow(BigInt('0x' + ciphertext), d, n);
+      return hex2str(decryptedBigInt.toString(16)); // Konversi BigInt kembali ke teks
+    }
+
+    // Fungsi konversi string ke hexadecimal
+    function str2hex(str) {
+      let hex = '';
+      for (let i = 0; i < str.length; i++) {
+        hex += '' + str.charCodeAt(i).toString(16);
+      }
+      return hex;
+    }
+
+    // Fungsi konversi hexadecimal ke string
+    function hex2str(hex) {
+      let str = '';
+      for (let i = 0; i < hex.length; i += 2) {
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+      }
+      return str;
+    }
+
+    // Fungsi perhitungan modulus eksponen untuk RSA
+    function modPow(base, exponent, modulus) {
+      if (modulus === 1n) return 0n;
+      let result = 1n;
+      base = base % modulus;
+      while (exponent > 0) {
+        if (exponent % 2n === 1n) result = (result * base) % modulus;
+        exponent = exponent >> 1n;
+        base = (base * base) % modulus;
+      }
+      return result;
+    }
+  </script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

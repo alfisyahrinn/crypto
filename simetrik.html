@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Enkripsi AES</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+      <div class="container">
+        <a class="navbar-brand text-light" href="index.html">Alfi Syahrin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="caesar.html">Caesar</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="affine-cipher.html">Affine Cipher</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="simetrik.html">Simetrik</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="asimetrik.html">Asasimetrik</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <h1>Enkripsi AES</h1>
+
+      <div class="form-group">
+        <label for="inputText">Masukkan Teks:</label>
+        <input type="text" class="form-control" id="inputText" />
+      </div>
+
+      <div class="form-group">
+        <label for="key">Kunci (16 karakter):</label>
+        <input type="text" class="form-control" id="key" maxlength="16" />
+      </div>
+
+      <button class="btn btn-primary mr-2" onclick="encrypt()">Enkripsi</button>
+
+      <div class="form-group">
+        <label for="result">Hasil:</label>
+        <input type="text" class="form-control" id="result" readonly />
+      </div>
+    </div>
+
+    <script>
+      // Fungsi enkripsi
+      async function encrypt() {
+        const plaintext = document.getElementById('inputText').value;
+        const key = document.getElementById('key').value;
+
+        try {
+          const encodedText = new TextEncoder().encode(plaintext);
+          const encodedKey = new TextEncoder().encode(key);
+          const cryptoKey = await window.crypto.subtle.importKey('raw', encodedKey, 'AES-CBC', false, ['encrypt']);
+
+          const iv = window.crypto.getRandomValues(new Uint8Array(16));
+          const encrypted = await window.crypto.subtle.encrypt(
+            {
+              name: 'AES-CBC',
+              iv: iv,
+            },
+            cryptoKey,
+            encodedText
+          );
+
+          const encryptedBytes = new Uint8Array(iv.length + encrypted.byteLength);
+          encryptedBytes.set(iv, 0);
+          encryptedBytes.set(new Uint8Array(encrypted), iv.length);
+          const encryptedBase64 = btoa(String.fromCharCode.apply(null, encryptedBytes));
+
+          document.getElementById('result').value = encryptedBase64;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      // Fungsi dekripsi
+      async function decrypt() {
+        const ciphertext = document.getElementById('result').value;
+        const key = document.getElementById('key').value;
+
+        try {
+          const decodedData = atob(ciphertext);
+          const cryptoKey = await window.crypto.subtle.importKey('raw', new TextEncoder().encode(key), 'AES-CBC', false, ['decrypt']);
+
+          const iv = new Uint8Array(decodedData.slice(0, 16)); // Ambil IV dari decodedData
+          const encrypted = new Uint8Array(
+            decodedData
+              .slice(16)
+              .split('')
+              .map((c) => c.charCodeAt(0))
+          ); // Mengubah string ciphertext ke array of bytes
+
+          const decrypted = await window.crypto.subtle.decrypt(
+            {
+              name: 'AES-CBC',
+              iv: iv,
+            },
+            cryptoKey,
+            encrypted
+          );
+
+          const decryptedText = new TextDecoder().decode(decrypted);
+          document.getElementById('inputText').value = decryptedText;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

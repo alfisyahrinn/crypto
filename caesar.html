@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sandi Caesar</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+      <div class="container">
+        <a class="navbar-brand text-light" href="index.html">Alfi Syahrin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="caesar.html">Caesar</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="affine-cipher.html">Affine Cipher</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="simetrik.html">Simetrik</a>
+            </li>
+            <li class="nav-item text-light">
+              <a class="nav-link text-light" href="asimetrik.html">Asasimetrik</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <h1 class="mb-4">Sandi Caesar</h1>
+
+      <div class="form-group">
+        <label for="plaintext">Masukkan Teks:</label>
+        <input type="text" class="form-control" id="plaintext" />
+      </div>
+
+      <div class="form-group">
+        <label for="shift">Pergeseran (0-25):</label>
+        <input type="number" class="form-control" id="shift" min="0" max="25" value="3" />
+      </div>
+
+      <button class="btn btn-primary mr-2" onclick="encrypt()">Enkripsi</button>
+      <button class="btn btn-primary" onclick="decrypt()">Dekripsi</button>
+
+      <div class="form-group mt-4">
+        <label for="result">Hasil:</label>
+        <input type="text" class="form-control" id="result" readonly />
+      </div>
+    </div>
+
+    <script>
+      function caesarCipherEncrypt(text, shift) {
+        return text.replace(/[a-zA-Z]/g, function (char) {
+          let charCode = char.charCodeAt(0);
+          let offset = char >= 'a' ? 97 : 65;
+          return String.fromCharCode(((charCode - offset + shift) % 26) + offset);
+        });
+      }
+
+      function caesarCipherDecrypt(text, shift) {
+        return caesarCipherEncrypt(text, (26 - shift) % 26);
+      }
+
+      function encrypt() {
+        const plaintext = document.getElementById('plaintext').value.toUpperCase();
+        const shiftAmount = parseInt(document.getElementById('shift').value);
+        const encryptedText = caesarCipherEncrypt(plaintext, shiftAmount);
+        document.getElementById('result').value = encryptedText;
+      }
+
+      function decrypt() {
+        const ciphertext = document.getElementById('result').value.toUpperCase();
+        const shiftAmount = parseInt(document.getElementById('shift').value);
+        const decryptedText = caesarCipherDecrypt(ciphertext, shiftAmount);
+        document.getElementById('plaintext').value = decryptedText;
+      }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
